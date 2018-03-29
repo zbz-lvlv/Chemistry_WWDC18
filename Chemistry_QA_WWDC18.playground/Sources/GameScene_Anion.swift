@@ -1,10 +1,10 @@
 import Foundation
 import SpriteKit
 
-public class GameScene_Cation : SKScene{
+public class GameScene_Anion : SKScene{
     
     //Background
-    let spriteNodeBackground = SKSpriteNode(imageNamed: "background_tutorial_cation.png")
+    let spriteNodeBackground = SKSpriteNode(imageNamed: "background_anion.png")
     
     //Menu items
     var menuItems: [SKShapeNode] = []
@@ -61,7 +61,7 @@ public class GameScene_Cation : SKScene{
         
         generateGuidingText()
         generateMenuButtons()
-        generateCations()
+        generateAnions()
         generateReagentBottles()
         
     }
@@ -149,7 +149,7 @@ public class GameScene_Cation : SKScene{
             menuItems.append(shapeNode)
             self.addChild(shapeNode)
             
-            if(i == 1){ //0 for tutorial option. 1 for cations. 2 for anions. 3 for try it out
+            if(i == 2){ //0 for tutorial option. 1 for cations. 2 for anions. 3 for try it out
                 labelNode.fontColor = selectedColorFont
                 shapeNode.fillColor = selectedColor
             }
@@ -164,16 +164,16 @@ public class GameScene_Cation : SKScene{
         
     }
     
-    public func generateCations(){
+    public func generateAnions(){
         
-        let cationImages = ["cu_light.png", "fe2.png", "fe3.png", "zn.png", "al.png"]
+        let anionImages = ["so4.png", "cl.png", "br.png", "i.png"]
         
         var i = 0
-        for cationImage in cationImages{
+        for anionImage in anionImages{
             
-            let spriteNode = SKSpriteNode(imageNamed: cationImage)
+            let spriteNode = SKSpriteNode(imageNamed: anionImage)
             spriteNode.size = CGSize(width: 60, height: 150)
-            spriteNode.position = CGPoint(x: 134 + i * 123, y: 135)
+            spriteNode.position = CGPoint(x: 195 + i * 123, y: 135)
             self.addChild(spriteNode)
             
             ionTestTubes.append(spriteNode)
@@ -209,7 +209,7 @@ public class GameScene_Cation : SKScene{
         
         let welcomeText =
             ["Here are more solutions with ions you can experiment with.",
-             "You can also select negative ions in the menu bar on the left",
+             "You can also select positive ions in the menu bar on the left",
              " to experiment with them, or test your knowledge in",
              "'try-it-out' once you're ready."]
         
@@ -313,36 +313,10 @@ public class GameScene_Cation : SKScene{
         
     }
     
-    public func removePrecipitate(){
-        
-        for ppt in precipitatesInSolution{
-            ppt.removeFromParent();
-        }
-        
-    }
-    
-    public func changeColor(newFileName: String){
-        
-        let newTexture = SKTexture(image: UIImage(named: newFileName)!)
-        solutionOnPlatform.texture = newTexture
-        
-    }
-    
-    public func displayPromptToPourExcessReagent(reagent: SKSpriteNode, text: [String]){
-        
-        editingGuidingText(linesIn: text)
-        reagent.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
-        
-    }
-    
-    public func displayExcessResults(text: [String]){
-        editingGuidingText(linesIn: text)
-    }
-    
     public func touchDown(atPoint pos : CGPoint) {
         
-        if(stage == 1 || stage == 2){
-        
+        if(stage == 1){
+            
             if(atPoint(pos) == nh3Bottle && !isHoldingBottle){
                 displayPromptToPourReagent(reagent: nh3Bottle)
                 reagentUsedString = "ammonia"
@@ -374,7 +348,7 @@ public class GameScene_Cation : SKScene{
     }
     
     public func touchUp(atPoint pos : CGPoint) {
-
+        
         //For menu bar navigation
         
         //Tutorial
@@ -434,7 +408,7 @@ public class GameScene_Cation : SKScene{
         case 0:
             
             var i = 0
-            while(i < 5){
+            while(i < 4){
                 if(atPoint(pos) == ionTestTubes[i]){
                     stage = 1;
                     
@@ -445,8 +419,17 @@ public class GameScene_Cation : SKScene{
                     putSolutionOnPlatform(number: i)
                     ionUsed = getIonUsedFromIndex(index: i)
                     
-                    let text = ["This solution reacts with ammonia(NH3)"]
-                    editingGuidingText(linesIn: text)
+                    //sulfate ions
+                    if(i == 0){
+                        let text = ["This solution reacts with barium nitrate"]
+                        editingGuidingText(linesIn: text)
+                    }
+                        
+                    //halide ions
+                    else{
+                        let text = ["This solution reacts with silver nitrate"]
+                        editingGuidingText(linesIn: text)
+                    }
                     
                 }
                 
@@ -467,66 +450,17 @@ public class GameScene_Cation : SKScene{
                         //Continue from here because need to wait for completion
                         
                         switch(self.reagentUsed){
-                        case .ammonia:
+                        case .bariumNitrate:
                             
                             switch(self.ionUsed){
-                            case .cu:
-                                self.formPrecipitate(color: UIColor(red: 25/255, green: 143/255, blue: 1, alpha: 1))
-                                
-                                let text = ["Same blue solid(precipitate) has formed!",
-                                            "Let's see what happens if we keep",
-                                            "on adding ammonia (NH3)."]
-                                self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
-                                
-                                self.stage = 2;
-                                
-                                break;
-                                
-                            case .fe2:
-                                self.formPrecipitate(color: UIColor(red: 35/255, green: 113/255, blue: 25/255, alpha: 1))
-                                
-                                let text = ["Same green solid(precipitate) has formed!",
-                                            "Let's see what happens if we keep",
-                                            "on adding ammonia (NH3)."]
-                                self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
-                                
-                                self.stage = 2;
-                                
-                                break;
-                                
-                            case .fe3:
-                                self.formPrecipitate(color: UIColor(red: 239/255, green: 100/255, blue: 43/255, alpha: 1))
-                                
-                                let text = ["Same red solid(precipitate) has formed!",
-                                            "Let's see what happens if we keep",
-                                            "on adding ammonia (NH3)."]
-                                self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
-                                
-                                self.stage = 2;
-                                
-                                break;
-                                
-                            case .zn:
+                            case .so4:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
                                 let text = ["Same white solid(precipitate) has formed!",
-                                            "Let's see what happens if we keep",
-                                            "on adding ammonia (NH3)."]
-                                self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
-                                
-                                self.stage = 2;
-                                
-                                break;
-                                
-                            case .al:
-                                self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
-                                
-                                let text = ["Same white solid(precipitate) has formed!",
-                                            "Let's see what happens if we keep",
-                                            "on adding ammonia (NH3)."]
-                                self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
-                                
-                                self.stage = 2;
+                                            "There is no need to add excess barium nitrate.",
+                                             "You can click on another solution below to try it out."]
+                                self.editingGuidingText(linesIn: text)
+                                self.stage = 0;
                                 
                                 break;
                                 
@@ -536,87 +470,38 @@ public class GameScene_Cation : SKScene{
                             
                             break;
                             
-                        default:
-                            break;
-                            
-                        }
-                        
-                    })
-                    
-                }
-            }
-            
-            break;
-            
-        case 2:
-
-            if(isHoldingBottle){
-                
-                if(calculateDistance(x1: bottleHeld.position.x, y1: bottleHeld.position.y, x2: solutionOnPlatform.position.x, y2: solutionOnPlatform.position.y + solutionOnPlatform.size.height / 2) < 100){
-                    
-                    pourReagent();
-                    
-                    self.run(SKAction.sequence([SKAction.wait(forDuration: 1.5)]),completion: {() -> Void in
-                        //Continue from here because need to wait for completion
-                        
-                        switch(self.reagentUsed){
-                        case .ammonia:
+                        case .silverNitrate:
                             
                             switch(self.ionUsed){
-                            case .cu:
+                            case .cl:
+                                self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
-                                self.removePrecipitate();
-                                self.changeColor(newFileName: "cu_dark.png");
-                                
-                                let text = ["The blue solid dissolves into a dark blue solution.",
+                                let text = ["Same white solid(precipitate) has formed!",
+                                            "There is no need to add excess silver nitrate.",
                                             "You can click on another solution below to try it out."]
-                                
-                                self.displayExcessResults(text: text);
-                                
+                                self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 
                                 break;
                                 
-                            case .fe2:
-                                let text = ["No reaction was observed.",
+                            case .br:
+                                self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 0.7, alpha: 1))
+                                
+                                let text = ["Same light-yellow solid(precipitate) has formed!",
+                                            "There is no need to add excess silver nitrate.",
                                             "You can click on another solution below to try it out."]
-                                
-                                self.displayExcessResults(text: text);
-                                
+                                self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 
                                 break;
                                 
-                            case .fe3:
-                                let text = ["No reaction was observed.",
+                            case .i:
+                                self.formPrecipitate(color: UIColor(red: 1, green: 0.8, blue: 0, alpha: 1))
+                                
+                                let text = ["Same yellow solid(precipitate) has formed!",
+                                            "There is no need to add excess silver nitrate.",
                                             "You can click on another solution below to try it out."]
-                                
-                                self.displayExcessResults(text: text);
-                                
-                                self.stage = 0;
-                                
-                                break;
-                                
-                            case .zn:
-                                
-                                self.removePrecipitate()
-                                
-                                let text = ["White solid dissolves into a colourless solution.",
-                                            "You can click on another solution below to try it out."]
-                                
-                                self.displayExcessResults(text: text);
-                                
-                                self.stage = 0;
-                                
-                                break;
-                                
-                            case .al:
-                                
-                                let text = ["No reaction was observed.",
-                                            "You can click on another solution below to try it out."]
-                                
-                                self.displayExcessResults(text: text);
-                                
+                                self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 
                                 break;
@@ -636,17 +521,13 @@ public class GameScene_Cation : SKScene{
                     
                 }
             }
-            
-            break;
-            
-        case 3: //Excess ammonia -> Forms dark blue copper(II) complex
             
             break;
             
         default:
             break;
         }
-    
+        
         
     }
     
@@ -676,15 +557,13 @@ public class GameScene_Cation : SKScene{
         
         switch(index){
         case 0:
-            return Ion.cu
+            return Ion.so4
         case 1:
-            return Ion.fe2
+            return Ion.cl
         case 2:
-            return Ion.fe3
+            return Ion.br
         case 3:
-            return Ion.zn
-        case 4:
-            return Ion.al
+            return Ion.i
         default:
             return Ion.none
         }

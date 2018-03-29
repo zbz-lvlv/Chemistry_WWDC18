@@ -4,7 +4,11 @@ import SpriteKit
 public class GameScene_Tutorial : SKScene{
     
     //Background
-    let spriteNodeBackground = SKSpriteNode(imageNamed: "background_tutorial.png")
+    let spriteNodeBackground = SKSpriteNode(imageNamed: "background_tutorial_cation.png")
+    
+    //Menu items
+    var menuItems: [SKShapeNode] = []
+    var menuItemLabels: [SKLabelNode] = []
     
     //Guiding texts
     var labelNodesGuidingText: [SKLabelNode] = []
@@ -101,10 +105,8 @@ public class GameScene_Tutorial : SKScene{
         
         var lines = linesIn
         
-        var fillerIterator = 0
-        while (fillerIterator < 4 - lines.count) {
+        while (lines.count < 4) {
             lines.append("")
-            fillerIterator += 1
         }
         
         var i = 0
@@ -119,7 +121,7 @@ public class GameScene_Tutorial : SKScene{
     
     public func generateMenuButtons(){
         
-        let menuTitles = ["Tutorial", "Cation tests", "Anion tests", "Try-it-out"]
+        let menuTitles = ["Tutorial", "Positive ions", "Negative ions", "Try-it-out"]
         
         let nonSelectedColor = UIColor(red: 112/255, green: 48/255, blue: 160/255, alpha: 1)
         let selectedColor = UIColor(red: 255/255, green: 240/255, blue: 255/255, alpha: 1)
@@ -132,15 +134,17 @@ public class GameScene_Tutorial : SKScene{
             
             let labelNode = SKLabelNode(fontNamed: "Futura")
             labelNode.text = menuTitle
-            labelNode.fontSize = 14
-            labelNode.position = CGPoint(x: 77/2, y: 30/2)
+            labelNode.fontSize = 13
+            labelNode.position = CGPoint(x: 85/2, y: 30/2)
             labelNode.horizontalAlignmentMode = .center
             labelNode.verticalAlignmentMode = .center
+            menuItemLabels.append(labelNode)
             
-            let shapeNode = SKShapeNode(rect: CGRect(x: 0, y: 0, width: 77, height: 30), cornerRadius: 5)
-            shapeNode.position = CGPoint(x: 10, y: 520 - i * 50)
+            let shapeNode = SKShapeNode(rect: CGRect(x: 0, y: 0, width: 85, height: 30), cornerRadius: 5)
+            shapeNode.position = CGPoint(x: 6, y: 520 - i * 50)
             shapeNode.addChild(labelNode)
             
+            menuItems.append(shapeNode)
             self.addChild(shapeNode)
             
             if(i == 0){ //0 for tutorial option. 1 for cations. 2 for anions. 3 for try it out
@@ -320,8 +324,8 @@ public class GameScene_Tutorial : SKScene{
             pptNode.fillColor = color
             pptNode.strokeColor = UIColor.clear
             
-            let x = Int(arc4random_uniform(32)) + 364
-            let y = Int(arc4random_uniform(20)) + 254
+            let x = Int(arc4random_uniform(26)) + 367
+            let y = Int(arc4random_uniform(20)) + 256
             pptNode.position = CGPoint(x: x, y: y);
             
             precipitatesInSolution.append(pptNode)
@@ -405,7 +409,62 @@ public class GameScene_Tutorial : SKScene{
     }
     
     public func touchUp(atPoint pos : CGPoint) {
-    
+        
+        //For menu bar navigation
+        
+        //Tutorial
+        if(atPoint(pos) == menuItems[0] || atPoint(pos) == menuItemLabels[0]){
+            if let scene = GameScene_Tutorial(fileNamed: "GameScene_Tutorial.sks") {
+                // Set the scale mode to scale to fit the window
+                scene.scaleMode = .resizeFill
+                
+                // Present the scene
+                self.view!.presentScene(scene)
+                
+                return;
+            }
+        }
+            
+        //Cation
+        else if(atPoint(pos) == menuItems[1] || atPoint(pos) == menuItemLabels[1]){
+            
+            if let scene = GameScene_Cation(fileNamed: "GameScene_Cation.sks") {
+                // Set the scale mode to scale to fit the window
+                scene.scaleMode = .resizeFill
+
+                // Present the scene
+                self.view!.presentScene(scene)
+                
+                return;
+            }
+        }
+            
+        //Anion
+        else if(atPoint(pos) == menuItems[2] || atPoint(pos) == menuItemLabels[2]){
+            if let scene = GameScene_Anion(fileNamed: "GameScene_Anion.sks") {
+                // Set the scale mode to scale to fit the window
+                scene.scaleMode = .resizeFill
+                
+                // Present the scene
+                self.view!.presentScene(scene)
+                
+                return;
+            }
+        }
+            
+        //Test
+        else if(atPoint(pos) == menuItems[3] || atPoint(pos) == menuItemLabels[3]){
+            if let scene = GameScene_Tutorial(fileNamed: "GameScene_Tutorial.sks") {
+                // Set the scale mode to scale to fit the window
+                scene.scaleMode = .resizeFill
+                
+                // Present the scene
+                self.view!.presentScene(scene)
+                
+                return;
+            }
+        }
+        
         switch stage{
         case 0:
             
