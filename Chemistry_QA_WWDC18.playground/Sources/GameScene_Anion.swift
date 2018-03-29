@@ -19,7 +19,7 @@ public class GameScene_Anion : SKScene{
     var nh3Bottle: SKSpriteNode!
     var bano32Bottle: SKSpriteNode!
     var agno3Bottle: SKSpriteNode!
-    var bottleHeld: SKSpriteNode!
+    var bottleHeld = SKSpriteNode()
     var isHoldingBottle = false;
     var reagentUsed = Reagent.none;
     var reagentUsedString = ""
@@ -208,14 +208,19 @@ public class GameScene_Anion : SKScene{
     public func displayWelcomeText(){
         
         let welcomeText =
-            ["Here are more solutions with ions you can experiment with.",
-             "You can also select positive ions in the menu bar on the left",
-             " to experiment with them, or test your knowledge in",
-             "'try-it-out' once you're ready."]
+            ["Click on the solutions to experiment with them."]
         
         editingGuidingText(linesIn: welcomeText)
+    }
+    
+    public func displayWelcomeText2(){
         
-        buttonNext.isHidden = true;
+        let welcomeText =
+            ["You can also click on positive ions in the menu bar",
+             "to experiment with them. Once you're ready, you can test",
+             "your knowledge under try-it-out."]
+        
+        editingGuidingText(linesIn: welcomeText)
     }
     
     public func putSolutionOnPlatform(number: Int){
@@ -337,6 +342,39 @@ public class GameScene_Anion : SKScene{
             
         }
         
+        if(stage == 0){
+            
+            var i = 0
+            while(i < 4){
+                if(atPoint(pos) == ionTestTubes[i]){
+                    stage = 1;
+                    
+                    if let _ = solutionOnPlatform {
+                        solutionOnPlatform.removeFromParent();
+                    }
+                    
+                    putSolutionOnPlatform(number: i)
+                    ionUsed = getIonUsedFromIndex(index: i)
+                    
+                    //sulfate ions
+                    if(i == 0){
+                        let text = ["This solution reacts with barium nitrate"]
+                        editingGuidingText(linesIn: text)
+                    }
+                        
+                        //halide ions
+                    else{
+                        let text = ["This solution reacts with silver nitrate"]
+                        editingGuidingText(linesIn: text)
+                    }
+                    
+                }
+                
+                i += 1
+            }
+            
+        }
+        
     }
     
     public func touchMoved(toPoint pos : CGPoint) {
@@ -404,39 +442,12 @@ public class GameScene_Anion : SKScene{
             }
         }
         
+        if(atPoint(pos) == buttonNext || atPoint(pos) == buttonNextLabel){
+            displayWelcomeText2();
+            buttonNext.isHidden = true;
+        }
+        
         switch stage{
-        case 0:
-            
-            var i = 0
-            while(i < 4){
-                if(atPoint(pos) == ionTestTubes[i]){
-                    stage = 1;
-                    
-                    if let _ = solutionOnPlatform {
-                        solutionOnPlatform.removeFromParent();
-                    }
-                    
-                    putSolutionOnPlatform(number: i)
-                    ionUsed = getIonUsedFromIndex(index: i)
-                    
-                    //sulfate ions
-                    if(i == 0){
-                        let text = ["This solution reacts with barium nitrate"]
-                        editingGuidingText(linesIn: text)
-                    }
-                        
-                    //halide ions
-                    else{
-                        let text = ["This solution reacts with silver nitrate"]
-                        editingGuidingText(linesIn: text)
-                    }
-                    
-                }
-                
-                i += 1
-            }
-            
-            break;
             
         case 1:
             
@@ -456,9 +467,8 @@ public class GameScene_Anion : SKScene{
                             case .so4:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
-                                let text = ["Same white solid(precipitate) has formed!",
-                                            "There is no need to add excess barium nitrate.",
-                                             "You can click on another solution below to try it out."]
+                                let text = ["Some white solid(precipitate) has formed!",
+                                             "Click on another solution below to try it out."]
                                 self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 
@@ -476,9 +486,8 @@ public class GameScene_Anion : SKScene{
                             case .cl:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
-                                let text = ["Same white solid(precipitate) has formed!",
-                                            "There is no need to add excess silver nitrate.",
-                                            "You can click on another solution below to try it out."]
+                                let text = ["Some white solid(precipitate) has formed!",
+                                            "Click on another solution below to try it out."]
                                 self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 
@@ -487,9 +496,8 @@ public class GameScene_Anion : SKScene{
                             case .br:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 0.7, alpha: 1))
                                 
-                                let text = ["Same light-yellow solid(precipitate) has formed!",
-                                            "There is no need to add excess silver nitrate.",
-                                            "You can click on another solution below to try it out."]
+                                let text = ["Some light-yellow solid(precipitate) has formed!",
+                                            "Click on another solution below to try it out."]
                                 self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 
@@ -498,9 +506,8 @@ public class GameScene_Anion : SKScene{
                             case .i:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 0.8, blue: 0, alpha: 1))
                                 
-                                let text = ["Same yellow solid(precipitate) has formed!",
-                                            "There is no need to add excess silver nitrate.",
-                                            "You can click on another solution below to try it out."]
+                                let text = ["Some yellow solid(precipitate) has formed!",
+                                            "Click on another solution below to try it out."]
                                 self.editingGuidingText(linesIn: text)
                                 self.stage = 0;
                                 

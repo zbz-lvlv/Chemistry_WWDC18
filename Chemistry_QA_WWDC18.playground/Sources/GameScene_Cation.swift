@@ -19,7 +19,7 @@ public class GameScene_Cation : SKScene{
     var nh3Bottle: SKSpriteNode!
     var bano32Bottle: SKSpriteNode!
     var agno3Bottle: SKSpriteNode!
-    var bottleHeld: SKSpriteNode!
+    var bottleHeld = SKSpriteNode()
     var isHoldingBottle = false;
     var reagentUsed = Reagent.none;
     var reagentUsedString = ""
@@ -208,14 +208,19 @@ public class GameScene_Cation : SKScene{
     public func displayWelcomeText(){
         
         let welcomeText =
-            ["Here are more solutions with ions you can experiment with.",
-             "You can also select negative ions in the menu bar on the left",
-             " to experiment with them, or test your knowledge in",
-             "'try-it-out' once you're ready."]
+            ["Click on the solutions to experiment with them."]
         
         editingGuidingText(linesIn: welcomeText)
+    }
+    
+    public func displayWelcomeText2(){
         
-        buttonNext.isHidden = true;
+        let welcomeText =
+            ["You can also click on negative ions in the menu bar",
+             "to experiment with them. Once you're ready, you can test",
+             "your knowledge under try-it-out."]
+        
+        editingGuidingText(linesIn: welcomeText)
     }
     
     public func putSolutionOnPlatform(number: Int){
@@ -363,6 +368,30 @@ public class GameScene_Cation : SKScene{
             
         }
         
+        if(stage == 0){
+            
+            var i = 0
+            while(i < 5){
+                if(atPoint(pos) == ionTestTubes[i]){
+                    stage = 1;
+                    
+                    if let _ = solutionOnPlatform {
+                        solutionOnPlatform.removeFromParent();
+                    }
+                    
+                    putSolutionOnPlatform(number: i)
+                    ionUsed = getIonUsedFromIndex(index: i)
+                    
+                    let text = ["This solution reacts with ammonia(NH3)"]
+                    editingGuidingText(linesIn: text)
+                    
+                }
+                
+                i += 1
+            }
+            
+        }
+        
     }
     
     public func touchMoved(toPoint pos : CGPoint) {
@@ -430,30 +459,12 @@ public class GameScene_Cation : SKScene{
             }
         }
         
+        if(atPoint(pos) == buttonNext || atPoint(pos) == buttonNextLabel){
+            displayWelcomeText2();
+            buttonNext.isHidden = true;
+        }
+        
         switch stage{
-        case 0:
-            
-            var i = 0
-            while(i < 5){
-                if(atPoint(pos) == ionTestTubes[i]){
-                    stage = 1;
-                    
-                    if let _ = solutionOnPlatform {
-                        solutionOnPlatform.removeFromParent();
-                    }
-                    
-                    putSolutionOnPlatform(number: i)
-                    ionUsed = getIonUsedFromIndex(index: i)
-                    
-                    let text = ["This solution reacts with ammonia(NH3)"]
-                    editingGuidingText(linesIn: text)
-                    
-                }
-                
-                i += 1
-            }
-            
-            break;
             
         case 1:
             
@@ -473,7 +484,7 @@ public class GameScene_Cation : SKScene{
                             case .cu:
                                 self.formPrecipitate(color: UIColor(red: 25/255, green: 143/255, blue: 1, alpha: 1))
                                 
-                                let text = ["Same blue solid(precipitate) has formed!",
+                                let text = ["Some blue solid(precipitate) has formed!",
                                             "Let's see what happens if we keep",
                                             "on adding ammonia (NH3)."]
                                 self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
@@ -485,7 +496,7 @@ public class GameScene_Cation : SKScene{
                             case .fe2:
                                 self.formPrecipitate(color: UIColor(red: 35/255, green: 113/255, blue: 25/255, alpha: 1))
                                 
-                                let text = ["Same green solid(precipitate) has formed!",
+                                let text = ["Some green solid(precipitate) has formed!",
                                             "Let's see what happens if we keep",
                                             "on adding ammonia (NH3)."]
                                 self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
@@ -497,7 +508,7 @@ public class GameScene_Cation : SKScene{
                             case .fe3:
                                 self.formPrecipitate(color: UIColor(red: 239/255, green: 100/255, blue: 43/255, alpha: 1))
                                 
-                                let text = ["Same red solid(precipitate) has formed!",
+                                let text = ["Some red solid(precipitate) has formed!",
                                             "Let's see what happens if we keep",
                                             "on adding ammonia (NH3)."]
                                 self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
@@ -509,7 +520,7 @@ public class GameScene_Cation : SKScene{
                             case .zn:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
-                                let text = ["Same white solid(precipitate) has formed!",
+                                let text = ["Some white solid(precipitate) has formed!",
                                             "Let's see what happens if we keep",
                                             "on adding ammonia (NH3)."]
                                 self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);
@@ -521,7 +532,7 @@ public class GameScene_Cation : SKScene{
                             case .al:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
-                                let text = ["Same white solid(precipitate) has formed!",
+                                let text = ["Some white solid(precipitate) has formed!",
                                             "Let's see what happens if we keep",
                                             "on adding ammonia (NH3)."]
                                 self.displayPromptToPourExcessReagent(reagent: self.nh3Bottle, text: text);

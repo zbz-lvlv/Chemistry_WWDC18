@@ -19,7 +19,7 @@ public class GameScene_Tutorial : SKScene{
     var nh3Bottle: SKSpriteNode!
     var bano32Bottle: SKSpriteNode!
     var agno3Bottle: SKSpriteNode!
-    var bottleHeld: SKSpriteNode!
+    var bottleHeld = SKSpriteNode()
     var isHoldingBottle = false;
     
     //Ions
@@ -367,7 +367,7 @@ public class GameScene_Tutorial : SKScene{
     public func displayExcessResults(){
         
         let text = ["The blue solid disappeared and the solution turned dark blue!",
-                    "Hence, if copper(II) ions are present, blue solid forms on",
+                    "If copper(II) ions are present, blue solid forms on",
                     "adding ammonia, and dissolves into a dark blue solution",
                     "with excess ammonia."]
         editingGuidingText(linesIn: text)
