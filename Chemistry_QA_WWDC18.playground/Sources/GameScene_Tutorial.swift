@@ -43,6 +43,8 @@ public class GameScene_Tutorial : SKScene{
     
     override public func didMove(to view: SKView) {
         
+        self.run(SKAction.playSoundFileNamed("tap.wav", waitForCompletion: false))
+        
         spriteNodeBackground.position = CGPoint(x: 760 / 2, y: 570 / 2)
         spriteNodeBackground.size = CGSize(width: 760, height: 570)
         spriteNodeBackground.zPosition = -2;
@@ -121,13 +123,22 @@ public class GameScene_Tutorial : SKScene{
     
     public func generateMenuButtons(){
         
-        let menuTitles = ["Tutorial", "Positive ions", "Negative ions", "Try-it-out"]
+        let menuTitles = ["Tutorial", "Positive ions", "Negative ions"]
         
         let nonSelectedColor = UIColor(red: 112/255, green: 48/255, blue: 160/255, alpha: 1)
         let selectedColor = UIColor(red: 255/255, green: 240/255, blue: 255/255, alpha: 1)
         
         let nonSelectedColorFont = UIColor(red: 255/255, green: 240/255, blue: 255/255, alpha: 1)
         let selectedColorFont = UIColor(red: 200/255, green: 0/255, blue: 0/255, alpha: 1)
+        
+        let labelNode = SKLabelNode(fontNamed: "Futura")
+        labelNode.text = "Menu Bar"
+        labelNode.fontSize = 15
+        labelNode.position = CGPoint(x: 50, y: 530)
+        labelNode.horizontalAlignmentMode = .center
+        labelNode.verticalAlignmentMode = .center
+        labelNode.fontColor = nonSelectedColorFont
+        self.addChild(labelNode)
         
         var i = 0
         for menuTitle in menuTitles{
@@ -141,7 +152,7 @@ public class GameScene_Tutorial : SKScene{
             menuItemLabels.append(labelNode)
             
             let shapeNode = SKShapeNode(rect: CGRect(x: 0, y: 0, width: 85, height: 30), cornerRadius: 5)
-            shapeNode.position = CGPoint(x: 6, y: 520 - i * 50)
+            shapeNode.position = CGPoint(x: 6, y: 470 - i * 50)
             shapeNode.addChild(labelNode)
             
             menuItems.append(shapeNode)
@@ -291,8 +302,10 @@ public class GameScene_Tutorial : SKScene{
         
         arrow.removeFromParent();
         
-        bottleHeld.position = CGPoint(x: 380, y: 460)
+        self.run(SKAction.playSoundFileNamed("pour.wav", waitForCompletion: false))
         
+        bottleHeld.position = CGPoint(x: 380, y: 460)
+
         //Animate flow of solution
         let solutionFlow = SKSpriteNode();
         solutionFlow.position = CGPoint(x: 380, y: 460)
@@ -381,6 +394,7 @@ public class GameScene_Tutorial : SKScene{
         case 2:
             
             if(atPoint(pos) == nh3Bottle && !isHoldingBottle){
+                self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
                 displayPromptToPourAmmonia()
             }
             
@@ -389,6 +403,7 @@ public class GameScene_Tutorial : SKScene{
         case 3:
             
             if(atPoint(pos) == nh3Bottle && !isHoldingBottle){
+                self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
                 displayPromptToPourAmmonia()
             }
             
@@ -451,25 +466,14 @@ public class GameScene_Tutorial : SKScene{
                 return;
             }
         }
-            
-        //Test
-        else if(atPoint(pos) == menuItems[3] || atPoint(pos) == menuItemLabels[3]){
-            if let scene = GameScene_Tutorial(fileNamed: "GameScene_Tutorial.sks") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .resizeFill
-                
-                // Present the scene
-                self.view!.presentScene(scene)
-                
-                return;
-            }
-        }
         
         switch stage{
         case 0:
             
             if(atPoint(pos) == buttonNext || atPoint(pos) == buttonNextLabel){
                 stage = 1;
+                
+                self.run(SKAction.playSoundFileNamed("tap.wav", waitForCompletion: false))
                 
                 displayPromptToPickUpCuSolution()
                 buttonNext.isHidden = true;
@@ -482,6 +486,8 @@ public class GameScene_Tutorial : SKScene{
             if(atPoint(pos) == ionTestTubes[0]){
                 stage = 2;
                 
+                self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
+                
                 putSolutionOnPlatform(number: 0) //Number 0 implies copper(II)
                 displayPromptToPickUpAmmonia()
             }
@@ -490,7 +496,7 @@ public class GameScene_Tutorial : SKScene{
             
         case 2:
             
-            if(calculateDistance(x1: bottleHeld.position.x, y1: bottleHeld.position.y, x2: solutionOnPlatform.position.x, y2: solutionOnPlatform.position.y + solutionOnPlatform.size.height / 2) < 100){
+            if(isHoldingBottle && calculateDistance(x1: bottleHeld.position.x, y1: bottleHeld.position.y, x2: solutionOnPlatform.position.x, y2: solutionOnPlatform.position.y + solutionOnPlatform.size.height / 2) < 100){
                 
                 stage = 3;
                 isHoldingBottle = false;
@@ -500,6 +506,8 @@ public class GameScene_Tutorial : SKScene{
                 self.run(SKAction.sequence([SKAction.wait(forDuration: 1.5)]),completion: {() -> Void in
                     //Continue from here because need to wait for completion
                     self.displayPromptToPourExcessAmmonia();
+                    
+                    self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
                 })
                 
                 //Cu2+ + 2OH- --> Cu(OH)2
@@ -511,7 +519,7 @@ public class GameScene_Tutorial : SKScene{
             
         case 3: //Excess ammonia -> Forms dark blue copper(II) complex
             
-            if(calculateDistance(x1: bottleHeld.position.x, y1: bottleHeld.position.y, x2: solutionOnPlatform.position.x, y2: solutionOnPlatform.position.y + solutionOnPlatform.size.height / 2) < 100){
+            if(isHoldingBottle && calculateDistance(x1: bottleHeld.position.x, y1: bottleHeld.position.y, x2: solutionOnPlatform.position.x, y2: solutionOnPlatform.position.y + solutionOnPlatform.size.height / 2) < 100){
                 
                 stage = 4
                 
@@ -519,9 +527,13 @@ public class GameScene_Tutorial : SKScene{
                 
                 self.run(SKAction.sequence([SKAction.wait(forDuration: 1.5)]),completion: {() -> Void in
                     
+                    self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+                    
                     self.removePrecipitate();
                     self.changeColor(newFileName: "cu_dark.png");
                     self.displayExcessResults();
+                    
+                    self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
                     
                     self.buttonNext.isHidden = false;
                     

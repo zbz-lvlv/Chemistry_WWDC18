@@ -21,12 +21,14 @@ public class GameScene_Anion : SKScene{
     var agno3Bottle: SKSpriteNode!
     var bottleHeld = SKSpriteNode()
     var isHoldingBottle = false;
+    var isPouringReagent = false;
     var reagentUsed = Reagent.none;
     var reagentUsedString = ""
     var ionUsed = Ion.none
     
     //Ions
     var ionTestTubes: [SKSpriteNode] = []
+    var ionTested: [Bool] = []
     
     //Solution on platform
     var solutionOnPlatform: SKSpriteNode!
@@ -44,6 +46,8 @@ public class GameScene_Anion : SKScene{
     var arrow: SKSpriteNode!
     
     override public func didMove(to view: SKView) {
+        
+        self.run(SKAction.playSoundFileNamed("tap.wav", waitForCompletion: false))
         
         spriteNodeBackground.position = CGPoint(x: 760 / 2, y: 570 / 2)
         spriteNodeBackground.size = CGSize(width: 760, height: 570)
@@ -123,13 +127,22 @@ public class GameScene_Anion : SKScene{
     
     public func generateMenuButtons(){
         
-        let menuTitles = ["Tutorial", "Positive ions", "Negative ions", "Try-it-out"]
+        let menuTitles = ["Tutorial", "Positive ions", "Negative ions"]
         
         let nonSelectedColor = UIColor(red: 112/255, green: 48/255, blue: 160/255, alpha: 1)
         let selectedColor = UIColor(red: 255/255, green: 240/255, blue: 255/255, alpha: 1)
         
         let nonSelectedColorFont = UIColor(red: 255/255, green: 240/255, blue: 255/255, alpha: 1)
         let selectedColorFont = UIColor(red: 200/255, green: 0/255, blue: 0/255, alpha: 1)
+        
+        let labelNode = SKLabelNode(fontNamed: "Futura")
+        labelNode.text = "Menu Bar"
+        labelNode.fontSize = 15
+        labelNode.position = CGPoint(x: 50, y: 530)
+        labelNode.horizontalAlignmentMode = .center
+        labelNode.verticalAlignmentMode = .center
+        labelNode.fontColor = nonSelectedColorFont
+        self.addChild(labelNode)
         
         var i = 0
         for menuTitle in menuTitles{
@@ -143,7 +156,7 @@ public class GameScene_Anion : SKScene{
             menuItemLabels.append(labelNode)
             
             let shapeNode = SKShapeNode(rect: CGRect(x: 0, y: 0, width: 85, height: 30), cornerRadius: 5)
-            shapeNode.position = CGPoint(x: 6, y: 520 - i * 50)
+            shapeNode.position = CGPoint(x: 6, y: 470 - i * 50)
             shapeNode.addChild(labelNode)
             
             menuItems.append(shapeNode)
@@ -177,6 +190,7 @@ public class GameScene_Anion : SKScene{
             self.addChild(spriteNode)
             
             ionTestTubes.append(spriteNode)
+            ionTested.append(false)
             
             i += 1
             
@@ -208,19 +222,30 @@ public class GameScene_Anion : SKScene{
     public func displayWelcomeText(){
         
         let welcomeText =
-            ["Click on the solutions to experiment with them."]
+            ["Click on the test tubes below to experiment with them."]
         
         editingGuidingText(linesIn: welcomeText)
+        
+        blinkAllTestTubes();
+        
+        buttonNext.isHidden = true;
     }
     
-    public func displayWelcomeText2(){
+    public func blinkAllTestTubes(){
         
-        let welcomeText =
-            ["You can also click on positive ions in the menu bar",
-             "to experiment with them. Once you're ready, you can test",
-             "your knowledge under try-it-out."]
+        for ionTestTube in ionTestTubes{
+            ionTestTube.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+        }
         
-        editingGuidingText(linesIn: welcomeText)
+    }
+    
+    public func unblinkAllTestTubes(){
+        
+        for ionTestTube in ionTestTubes{
+            ionTestTube.removeAllActions();
+            ionTestTube.alpha = 1;
+        }
+        
     }
     
     public func putSolutionOnPlatform(number: Int){
@@ -268,6 +293,10 @@ public class GameScene_Anion : SKScene{
     //takes 1.5 seconds
     public func pourReagent(){
         
+        isPouringReagent = true;
+        
+        self.run(SKAction.playSoundFileNamed("pour.wav", waitForCompletion: false))
+        
         arrow.removeFromParent();
         
         isHoldingBottle = false;
@@ -291,6 +320,8 @@ public class GameScene_Anion : SKScene{
         let bottleWait = SKAction.wait(forDuration: 1.2)
         bottleHeld.run(SKAction.sequence([bottleWait, fadeOut]),completion: {() -> Void in
             self.bottleHeld.removeFromParent();
+            
+            self.isPouringReagent = false
         })
         
     }
@@ -318,26 +349,52 @@ public class GameScene_Anion : SKScene{
         
     }
     
+    public func endOfExperience(text: String){
+        
+        let allTested = ionTested[0] && ionTested[1] && ionTested[2] && ionTested[3]
+        
+        if(allTested){
+            unblinkAllTestTubes()
+            
+            let lines: [String] =
+                [text,
+                 "Congratulations! You have mastered the tests for all the ions!",
+                 "You can continue experimenting with the ions if you want to.",
+                 "Thank you for reviewing my playground - By Zhang Bozheng"]
+            
+            editingGuidingText(linesIn: lines)
+            
+            
+        }
+        
+    }
+    
     public func touchDown(atPoint pos : CGPoint) {
         
-        if(stage == 1){
+        if(!isPouringReagent && stage == 1){
             
             if(atPoint(pos) == nh3Bottle && !isHoldingBottle){
                 displayPromptToPourReagent(reagent: nh3Bottle)
                 reagentUsedString = "ammonia"
                 reagentUsed = Reagent.ammonia
+                
+                self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
             }
             
             if(atPoint(pos) == agno3Bottle && !isHoldingBottle){
                 displayPromptToPourReagent(reagent: agno3Bottle)
                 reagentUsedString = "silver nitrate"
                 reagentUsed = Reagent.silverNitrate
+                
+                self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
             }
             
             if(atPoint(pos) == bano32Bottle && !isHoldingBottle){
                 displayPromptToPourReagent(reagent: bano32Bottle)
                 reagentUsedString = "barium nitrate"
                 reagentUsed = Reagent.bariumNitrate
+                
+                self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
             }
             
         }
@@ -345,9 +402,11 @@ public class GameScene_Anion : SKScene{
         if(stage == 0){
             
             var i = 0
-            while(i < 4){
+            while(i < ionTestTubes.count){
                 if(atPoint(pos) == ionTestTubes[i]){
                     stage = 1;
+                    
+                    self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
                     
                     if let _ = solutionOnPlatform {
                         solutionOnPlatform.removeFromParent();
@@ -362,11 +421,14 @@ public class GameScene_Anion : SKScene{
                         editingGuidingText(linesIn: text)
                     }
                         
-                        //halide ions
+                    //halide ions
                     else{
                         let text = ["This solution reacts with silver nitrate"]
                         editingGuidingText(linesIn: text)
                     }
+                    
+                    unblinkAllTestTubes()
+                    
                     
                 }
                 
@@ -428,24 +490,6 @@ public class GameScene_Anion : SKScene{
                 return;
             }
         }
-            
-            //Test
-        else if(atPoint(pos) == menuItems[3] || atPoint(pos) == menuItemLabels[3]){
-            if let scene = GameScene_Tutorial(fileNamed: "GameScene_Tutorial.sks") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .resizeFill
-                
-                // Present the scene
-                self.view!.presentScene(scene)
-                
-                return;
-            }
-        }
-        
-        if(atPoint(pos) == buttonNext || atPoint(pos) == buttonNextLabel){
-            displayWelcomeText2();
-            buttonNext.isHidden = true;
-        }
         
         switch stage{
             
@@ -461,6 +505,48 @@ public class GameScene_Anion : SKScene{
                         //Continue from here because need to wait for completion
                         
                         switch(self.reagentUsed){
+                            
+                        case .ammonia:
+                            
+                            switch(self.ionUsed){
+                            case .so4:
+                                let text = ["No reaction was observed.",
+                                            "Sulfate ions react with barium nitrate."]
+                                self.bano32Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
+                                
+                            case .cl:
+                                let text = ["No reaction was observed.",
+                                            "Chloride ions react with silver nitrate."]
+                                self.agno3Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
+                                
+                            case .br:
+                                let text = ["No reaction was observed.",
+                                            "Bromide ions react with silver nitrate."]
+                                self.agno3Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
+                                
+                            case .i:
+                                let text = ["No reaction was observed.",
+                                            "Iodide ions react with silver nitrate."]
+                                self.agno3Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
+                                
+                            default:
+                                break;
+                            }
+                            
+                            break;
+                            
                         case .bariumNitrate:
                             
                             switch(self.ionUsed){
@@ -468,9 +554,39 @@ public class GameScene_Anion : SKScene{
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
                                 let text = ["Some white solid(precipitate) has formed!",
-                                             "Click on another solution below to try it out."]
+                                             "Click on another test tube below to try it out."]
                                 self.editingGuidingText(linesIn: text)
+                                self.ionTested[0] = true
+                                self.blinkAllTestTubes()
                                 self.stage = 0;
+                                
+                                self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+                                
+                                self.endOfExperience(text: text[0])
+                                
+                                break;
+                                
+                            case .cl:
+                                let text = ["No reaction was observed.",
+                                            "Chloride ions react with silver nitrate."]
+                                self.agno3Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
+                                
+                            case .br:
+                                let text = ["No reaction was observed.",
+                                            "Bromide ions react with silver nitrate."]
+                                self.agno3Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
+                                
+                            case .i:
+                                let text = ["No reaction was observed.",
+                                            "Iodide ions react with silver nitrate."]
+                                self.agno3Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
                                 
                                 break;
                                 
@@ -483,13 +599,26 @@ public class GameScene_Anion : SKScene{
                         case .silverNitrate:
                             
                             switch(self.ionUsed){
+                            case .so4:
+                                let text = ["No reaction was observed.",
+                                            "Sulfate ions react with barium nitrate."]
+                                self.bano32Bottle.run(SKAction.repeatForever(SKAction.sequence([.fadeOut(withDuration: 0.8), .fadeIn(withDuration: 0.8)])))
+                                self.editingGuidingText(linesIn: text)
+                                
+                                break;
                             case .cl:
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 1, alpha: 1))
                                 
                                 let text = ["Some white solid(precipitate) has formed!",
-                                            "Click on another solution below to try it out."]
+                                            "Click on another test tube below to try it out."]
+                                self.ionTested[1] = true
                                 self.editingGuidingText(linesIn: text)
+                                self.blinkAllTestTubes()
                                 self.stage = 0;
+                                
+                                self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+                                
+                                self.endOfExperience(text: text[0])
                                 
                                 break;
                                 
@@ -497,9 +626,15 @@ public class GameScene_Anion : SKScene{
                                 self.formPrecipitate(color: UIColor(red: 1, green: 1, blue: 0.7, alpha: 1))
                                 
                                 let text = ["Some light-yellow solid(precipitate) has formed!",
-                                            "Click on another solution below to try it out."]
+                                            "Click on another test tube below to try it out."]
+                                self.ionTested[2] = true
                                 self.editingGuidingText(linesIn: text)
+                                self.blinkAllTestTubes()
                                 self.stage = 0;
+                                
+                                self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+                                
+                                self.endOfExperience(text: text[0])
                                 
                                 break;
                                 
@@ -507,9 +642,15 @@ public class GameScene_Anion : SKScene{
                                 self.formPrecipitate(color: UIColor(red: 1, green: 0.8, blue: 0, alpha: 1))
                                 
                                 let text = ["Some yellow solid(precipitate) has formed!",
-                                            "Click on another solution below to try it out."]
+                                            "Click on another test tube below to try it out."]
+                                self.ionTested[3] = true
                                 self.editingGuidingText(linesIn: text)
+                                self.blinkAllTestTubes()
                                 self.stage = 0;
+                                
+                                self.run(SKAction.playSoundFileNamed("success.wav", waitForCompletion: false))
+                                
+                                self.endOfExperience(text: text[0])
                                 
                                 break;
                                 
