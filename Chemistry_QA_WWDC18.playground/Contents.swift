@@ -24,7 +24,7 @@ let url = URL(fileURLWithPath: path)
 
 do {
     backgroundAP = try AVAudioPlayer(contentsOf: url)
-    backgroundAP?.volume = 0.05;
+    backgroundAP?.volume = 0.07;
     backgroundAP?.numberOfLoops = 10;
     backgroundAP?.play()
 } catch {
