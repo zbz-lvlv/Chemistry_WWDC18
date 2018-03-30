@@ -399,12 +399,17 @@ public class GameScene_Anion : SKScene{
             
         }
         
-        if(stage == 0){
+        if((stage == 0 || stage == 1) && !isHoldingBottle && !isPouringReagent){
             
             var i = 0
             while(i < ionTestTubes.count){
                 if(atPoint(pos) == ionTestTubes[i]){
                     stage = 1;
+                    
+                    bano32Bottle.removeAllActions()
+                    bano32Bottle.alpha = 1
+                    agno3Bottle.removeAllActions();
+                    agno3Bottle.alpha = 1
                     
                     self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
                     

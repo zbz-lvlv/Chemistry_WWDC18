@@ -444,12 +444,15 @@ public class GameScene_Cation : SKScene{
             
         }
         
-        if(stage == 0){
+        if((stage == 0 || stage == 1) && !isHoldingBottle && !isPouringReagent){
             
             var i = 0
             while(i < ionTestTubes.count){
                 if(atPoint(pos) == ionTestTubes[i]){
                     stage = 1;
+                    
+                    nh3Bottle.removeAllActions()
+                    nh3Bottle.alpha = 1
                     
                     self.run(SKAction.playSoundFileNamed("grab.wav", waitForCompletion: false))
                     
